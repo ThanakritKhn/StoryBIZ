@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOY BIZ</title>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                        tech: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        'sci-bg': '#020502',
+                        'sci-card': '#0a150a',
+                        'sci-green': '#00ff41',
+                        'sci-dim': '#143314',
+                        'sci-dark': '#050f05',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- External Config -->
+    <script src="config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+    <style>
+        body {
+            background-color: #020502;
+            background-image:
+                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: #ecfdf5;
+        }
+
+        /* Config Panel Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050f05;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #15803d;
+            border-radius: 3px;
+        }
+
+        /* Inputs & Selects */
+        select,
+        input,
+        textarea {
+            background-color: #051005 !important;
+            border: 1px solid #14532d !important;
+            color: #4ade80 !important;
+            transition: all 0.3s ease;
+        }
+
+        select:focus,
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #00ff41 !important;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+
+        /* Dropdown Options */
+        option {
+            background-color: #020502;
+            color: #4ade80;
+        }
+
+        /* DESIGN 2.0 - PREVIEW STYLES */
+        .sci-preview {
+            background-color: #020402;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #14532d;
+            box-shadow: 0 0 60px rgba(0, 255, 65, 0.1);
+        }
+
+        .sci-bg-pattern {
+            background-image:
+                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .sci-glass {
+            background: rgba(4, 20, 4, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 65, 0.15);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .sci-glass-strong {
+            background: rgba(2, 10, 2, 0.85);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 255, 65, 0.2);
+            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+        }
+
+        .clip-diagonal {
+            clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+        }
+
+        .clip-chevron {
+            clip-path: polygon(100% 0, 100% 85%, 50% 100%, 0 85%, 0 0);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .border-glow {
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2), inset 0 0 20px rgba(0, 255, 65, 0.05);
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            @page {
+                size: landscape;
+                margin: 0;
+            }
+
+            body {
+                background: #000;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+                overflow: hidden;
+            }
+
+            .lg\:col-span-4,
+            h3,
+            button,
+            .max-w-\[1700px\] {
+                display: none !important;
+            }
+
+            #appContainer {
+                display: block !important;
+                width: 100%;
+                max-width: none;
+                margin: 0;
+            }
+
+            .lg\:col-span-8 {
+                display: flex !important;
+                width: 100% !important;
+                height: 100vh;
+                justify-content: center;
+                align-items: center;
+                padding: 0;
+            }
+
+            .sci-preview {
+                width: 297mm;
+                max-width: 100%;
+                transform: scale(0.9);
+                box-shadow: none;
+                border: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 md:p-8 font-sans selection:bg-green-900 selection:text-white">
+
+    <!-- Wrapper for print hiding logic (simpler than selective hiding) -->
+    <div id="appContainer" class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- EDITOR PANEL (Hidden on Print) -->
+        <div class="lg:col-span-4 space-y-6 print:hidden">
+            <div
+                class="bg-[#0a150a]/90 backdrop-blur border border-green-900/50 p-6 rounded-xl shadow-2xl relative overflow-hidden">
+                <!-- Decorative Top Line -->
+                <div
+                    class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sci-green to-transparent opacity-50">
+                </div>
+
+                <h2 class="text-2xl font-bold mb-6 text-sci-green flex items-center font-tech tracking-wider">
+                    <svg class="w-6 h-6 mr-3 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
+                        </path>
+                    </svg>
+                    SYSTEM CONFIG
+                </h2>
+
+                <div class="space-y-5">
+                    <!-- Dropdowns from Config -->
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                class="text-[10px] text-green-400/70 uppercase tracking-widest font-bold mb-1 block">วันที่เริ่ม</label>
+                            <input type="date" id="inputStartDate" class="w-full rounded h-10 px-3 uppercase"
+                                onchange="updatePreview()">
+                        </div>
+                        <div>
+                            <label
+                                class="text-[10px] text-green-400/70 uppercase tracking-widest font-bold mb-1 block">เวลาเริ่ม</label>
+                            <input type="time" id="inputStartTime" class="w-full rounded h-10 px-3 uppercase"
+                                onchange="updatePreview()">
+                        </div>
+                        <div>
+                            <label
+                                class="text-[10px] text-green-400/70 uppercase tracking-widest font-bold mb-1 block">วันที่จบ</label>
+                            <input type="date" id="inputEndDate" class="w-full rounded h-10 px-3 uppercase"
+                                onchange="updatePreview()">
+                        </div>
+                        <div>
+                            <label
+                                class="text-[10px] text-green-400/70 uppercase tracking-widest font-bold mb-1 block">เวลาจบ</label>
+                            <input type="time" id="inputEndTime" class="w-full rounded h-10 px-3 uppercase"
+                                onchange="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                class="text-[10px] text-green-400/70 uppercase tracking-widest font-bold mb-1 block">ประเภท
+                                (Type)</label>
+                            <select id="inputType" class="w-full rounded h-10 px-3 cursor-pointer"
+                                onchange="updatePreview()"></select>
+                        </div>
+                        <div>
+                            <label
+                                class="text-[10px] text-green-400/70 uppercase tracking-widest font-bold mb-1 block">จำนวนไฟท์
+                                (Round)</label>
+                            <select id="inputRound" class="w-full rounded h-10 px-3 cursor-pointer"
+                                onchange="updatePreview()"></select>
+                        </div>
+                        <div>
+                            <label
+                                class="text-[10px] text-green-400/70 uppercase tracking-widest font-bold mb-1 block">เงินเดิมพัน
+                                (Bet)</label>
+                            <select id="inputBet" class="w-full rounded h-10 px-3 cursor-pointer"
+                                onchange="updatePreview()"></select>
+                        </div>
+                        <div>
+                            <label
+                                class="text-[10px] text-green-400/70 uppercase tracking-widest font-bold mb-1 block">จำนวนคน
+                                (Players)</label>
+                            <select id="inputPlayers" class="w-full rounded h-10 px-3 cursor-pointer"
+                                onchange="updatePreview()"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full h-px bg-green-900/50 my-6"></div>
+
+                <!-- Gangs Input -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-black/40 p-3 rounded border border-green-900/50">
+                        <p class="text-xs font-bold text-green-400 mb-2 font-tech">GANG A (LEFT)</p>
+                        <input type="text" id="inputGangA" class="w-full text-xs mb-2 h-8 px-2 rounded"
+                            placeholder="ชื่อแก๊ง A" oninput="updatePreview()">
+                        <input type="text" id="inputLeaderA" class="w-full text-xs mb-2 h-8 px-2 rounded"
+                            placeholder="หัวหน้าแก๊ง A" oninput="updatePreview()">
+                        <input type="file" id="fileGangA" accept="image/*"
+                            class="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:bg-green-900 file:text-green-300 hover:file:bg-green-800"
+                            onchange="loadFile(event, 'imgGangA')">
+                    </div>
+                    <div class="bg-black/40 p-3 rounded border border-green-900/50">
+                        <p class="text-xs font-bold text-red-400 mb-2 font-tech">GANG B (RIGHT)</p>
+                        <input type="text" id="inputGangB" class="w-full text-xs mb-2 h-8 px-2 rounded"
+                            placeholder="ชื่อแก๊ง B" oninput="updatePreview()">
+                        <input type="text" id="inputLeaderB" class="w-full text-xs mb-2 h-8 px-2 rounded"
+                            placeholder="หัวหน้าแก๊ง B" oninput="updatePreview()">
+                        <input type="file" id="fileGangB" accept="image/*"
+                            class="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:bg-green-900 file:text-green-300 hover:file:bg-green-800"
+                            onchange="loadFile(event, 'imgGangB')">
+                    </div>
+                </div>
+
+                <div class="w-full h-px bg-green-900/50 my-6"></div>
+
+                <!-- Rules -->
+                <div>
+                    <label
+                        class="text-[10px] text-green-400/70 uppercase tracking-widest font-bold mb-1 flex justify-between items-center">
+                        <span>ข้อกำหนด (Rules)</span>
+                        <button onclick="clearRules()" class="text-xs text-red-400 hover:text-red-300">CLEAR
+                            ALL</button>
+                    </label>
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="inputRuleText" class="flex-1 h-9 rounded px-3 text-sm"
+                            placeholder="เพิ่มกฎใหม่...">
+                        <select id="inputRuleStatus" class="w-24 h-9 rounded px-1 text-xs">
+                            <option value="allow">อนุญาต</option>
+                            <option value="deny">ห้าม</option>
+                        </select>
+                        <button onclick="addRule()"
+                            class="bg-sci-green text-black h-9 w-9 rounded font-bold hover:bg-white transition flex items-center justify-center text-lg">+</button>
+                    </div>
+                </div>
+
+                <!-- Footer Note -->
+                <div class="mt-4">
+                    <label class="text-[10px] text-green-400/70 uppercase tracking-widest font-bold mb-1 block">หมายเหตุ
+                        (Note)</label>
+                    <textarea id="inputFooter" rows="3" class="w-full rounded p-3 text-sm"
+                        oninput="updatePreview()">การแจ้งใบกับทางแอดมิน: เป็นการแจ้งหลังจบสตอรี่เท่านั้น รายละเอียดนอกเหนือจากข้อตกลงจะอิงตามกฎประเทศ</textarea>
+                </div>
+
+                <!-- Actions -->
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <button onclick="saveImage()"
+                        class="bg-blue-600 hover:bg-blue-500 text-white font-bold font-tech py-4 rounded-lg shadow-lg flex justify-center items-center gap-2 transition active:scale-95">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        SAVE IMAGE
+                    </button>
+                    <button onclick="printPDF()"
+                        class="bg-gradient-to-r from-green-700 to-green-900 hover:from-green-600 hover:to-green-800 text-white font-bold font-tech py-4 rounded-lg shadow-lg flex justify-center items-center gap-2 transition active:scale-95">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                            </path>
+                        </svg>
+                        PRINT PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PREVIEW PANEL -->
+        <div class="lg:col-span-8 flex flex-col items-center pt-4 print:pt-0 print:col-span-12 print:w-full">
+            <h3 class="text-green-500/50 text-xs mb-3 uppercase tracking-[0.5em] font-tech animate-pulse print:hidden">
+                Live Preview System</h3>
+
+            <div id="captureArea" class="sci-preview w-full max-w-[900px] rounded text-white flex flex-col font-sans">
+
+                <!-- Background Layer -->
+                <div class="absolute inset-0 sci-bg-pattern opacity-30 z-0"></div>
+                <div class="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-green-900/20 to-transparent z-0"></div>
+
+                <!-- Floating Watermark -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-10 z-0 pointer-events-none">
+                    <img src="logo.png" class="w-[70%] blur-[1px]">
+                </div>
+
+                <!-- Header Bar -->
+                <div class="relative z-10 flex justify-between items-start p-6">
+                    <div class="flex flex-col">
+                        <h1
+                            class="text-6xl font-black italic tracking-tighter leading-none text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
+                            BIZ<span class="text-green-500">CITY</span>
+                        </h1>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="h-1 w-12 bg-green-500 rounded-full"></span>
+                            <span class="text-xs uppercase tracking-[0.3em] text-green-400/80 font-bold">Official
+                                Announcement</span>
+                        </div>
+                    </div>
+
+                    <!-- Date & Time Capsule -->
+                    <div class="sci-glass rounded-xl p-1 flex shadow-lg">
+                        <div class="flex items-center gap-4 px-5 py-3 border-r border-green-500/20">
+                            <div class="text-right">
+                                <p class="text-[9px] text-green-400 uppercase tracking-widest font-bold opacity-70">
+                                    Start</p>
+                                <p id="prevStartDate"
+                                    class="text-lg font-bold font-tech text-white leading-none mt-0.5">--/--/--</p>
+                            </div>
+                            <div class="text-2xl font-light text-green-600/50">|</div>
+                            <div class="text-left">
+                                <p id="prevStartTime" class="text-lg font-bold font-tech text-white leading-none">--:--
+                                </p>
+                                <p
+                                    class="text-[9px] text-green-400 uppercase tracking-widest font-bold opacity-70 text-right">
+                                    Time</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 px-5 py-3">
+                            <div class="text-right">
+                                <p class="text-[9px] text-green-400 uppercase tracking-widest font-bold opacity-70">End
+                                </p>
+                                <p id="prevEndDate" class="text-lg font-bold font-tech text-white leading-none mt-0.5">
+                                    --/--/--</p>
+                            </div>
+                            <div class="text-2xl font-light text-green-600/50">|</div>
+                            <div class="text-left">
+                                <p id="prevEndTime" class="text-lg font-bold font-tech text-white leading-none">--:--
+                                </p>
+                                <p
+                                    class="text-[9px] text-green-400 uppercase tracking-widest font-bold opacity-70 text-right">
+                                    Time</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAIN BATTLE STAGE -->
+                <div class="relative z-10 flex-1 flex items-center justify-center py-6">
+
+
+
+                    <div class="relative w-full flex items-center justify-between px-12 z-10">
+
+                        <!-- GANG A -->
+                        <div class="flex-1 flex flex-col items-center relative group">
+                            <div
+                                class="relative w-48 h-48 mb-6 transition-transform transform group-hover:scale-105 duration-500">
+                                <!-- Ring Animation -->
+                                <div
+                                    class="absolute inset-0 rounded-full border border-green-500/30 animate-[spin_12s_linear_infinite]">
+                                </div>
+                                <div
+                                    class="absolute -inset-2 rounded-full border border-green-500/10 border-dashed animate-[spin_20s_linear_infinite_reverse]">
+                                </div>
+
+                                <div
+                                    class="absolute inset-0 rounded-full overflow-hidden bg-black ring-4 ring-green-900/50 shadow-[0_0_30px_rgba(0,255,65,0.2)]">
+                                    <img id="imgGangA" src="" class="w-full h-full object-cover hidden">
+                                    <div id="phGangA"
+                                        class="w-full h-full flex items-center justify-center bg-[#0a150a]">
+                                        <span class="text-5xl font-black text-green-900">A</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center relative">
+                                <h2 id="prevGangA"
+                                    class="text-4xl font-black text-white italic tracking-wide uppercase drop-shadow-md mb-1">
+                                    GANG A</h2>
+                                <p id="prevLeaderA"
+                                    class="text-sm font-tech text-green-400 uppercase tracking-widest border-t border-green-500/30 pt-1 inline-block px-4">
+                                    LEADER NAME</p>
+                            </div>
+                        </div>
+
+                        <!-- VS BADGE -->
+                        <div class="mx-8 relative z-20">
+                            <div
+                                class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-800 rotate-45 border-4 border-[#020402] shadow-[0_0_20px_rgba(0,255,65,0.4)] flex items-center justify-center">
+                                <div class="-rotate-45">
+                                    <span class="text-3xl font-black text-white italic">VS</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GANG B -->
+                        <div class="flex-1 flex flex-col items-center relative group">
+                            <div
+                                class="relative w-48 h-48 mb-6 transition-transform transform group-hover:scale-105 duration-500">
+                                <!-- Ring Animation -->
+                                <div
+                                    class="absolute inset-0 rounded-full border border-red-500/30 animate-[spin_12s_linear_infinite]">
+                                </div>
+                                <div
+                                    class="absolute -inset-2 rounded-full border border-red-500/10 border-dashed animate-[spin_20s_linear_infinite_reverse]">
+                                </div>
+
+                                <div
+                                    class="absolute inset-0 rounded-full overflow-hidden bg-black ring-4 ring-red-900/50 shadow-[0_0_30px_rgba(220,38,38,0.2)]">
+                                    <img id="imgGangB" src="" class="w-full h-full object-cover hidden">
+                                    <div id="phGangB"
+                                        class="w-full h-full flex items-center justify-center bg-[#0a150a]">
+                                        <span class="text-5xl font-black text-red-900">B</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center relative">
+                                <h2 id="prevGangB"
+                                    class="text-4xl font-black text-white italic tracking-wide uppercase drop-shadow-md mb-1">
+                                    GANG B</h2>
+                                <p id="prevLeaderB"
+                                    class="text-sm font-tech text-red-400 uppercase tracking-widest border-t border-red-500/30 pt-1 inline-block px-4">
+                                    LEADER NAME</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- INFO STRIP -->
+                <div
+                    class="sci-glass-strong grid grid-cols-4 divide-x divide-green-500/10 backdrop-blur-md relative z-10 border-y border-green-500/20">
+                    <div class="py-4 text-center">
+                        <span class="block text-[10px] text-green-500/60 uppercase tracking-wider mb-1">Type</span>
+                        <span id="prevType" class="text-xl font-bold font-tech text-white">N/A</span>
+                    </div>
+                    <div class="py-4 text-center">
+                        <span class="block text-[10px] text-green-500/60 uppercase tracking-wider mb-1">Round</span>
+                        <span id="prevRound" class="text-xl font-bold font-tech text-white">-</span>
+                    </div>
+                    <div class="py-4 text-center">
+                        <span class="block text-[10px] text-green-500/60 uppercase tracking-wider mb-1">Bet</span>
+                        <span id="prevBet" class="text-xl font-bold font-tech text-yellow-400">0</span>
+                    </div>
+                    <div class="py-4 text-center">
+                        <span class="block text-[10px] text-green-500/60 uppercase tracking-wider mb-1">Players</span>
+                        <span id="prevPlayers" class="text-xl font-bold font-tech text-white">0 vs 0</span>
+                    </div>
+                </div>
+
+                <!-- FOOTER / RULES -->
+                <div class="bg-[#030803] p-8 pb-4 relative z-10">
+                    <div class="flex gap-8">
+                        <!-- Rules Column -->
+                        <div class="flex-1">
+                            <div class="flex items-center mb-4">
+                                <div class="w-1 h-4 bg-green-500 mr-2"></div>
+                                <h3 class="text-xs font-bold text-white uppercase tracking-[0.2em]">Rules & Conditions
+                                </h3>
+                            </div>
+                            <div id="rulesContainer" class="grid grid-cols-2 gap-2">
+                                <!-- Rules -->
+                            </div>
+                        </div>
+
+                        <!-- Note Column -->
+                        <div class="w-1/3 flex flex-col">
+                            <div class="flex items-center mb-4">
+                                <div class="w-1 h-4 bg-gray-500 mr-2"></div>
+                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Note</h3>
+                            </div>
+                            <div id="prevFooter"
+                                class="text-[10px] text-gray-400 leading-relaxed bg-white/5 p-3 rounded font-mono h-full">
+                                ...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Bar -->
+                    <div class="mt-6 flex justify-between items-end border-t border-white/5 pt-4">
+                        <div class="text-[9px] text-gray-600 uppercase tracking-widest font-mono">
+                            BizCity System
+                        </div>
+                        <img src="logo.png"
+                            class="h-6 opacity-30 grayscale cursor-pointer hover:grayscale-0 transition">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Options
+        function initConfig() {
+            // Check if CONFIG exists (loaded from config.js)
+            if (typeof CONFIG !== 'undefined') {
+                // Story Name Fixed
+                populateSelect('inputType', CONFIG.types);
+                populateSelect('inputRound', CONFIG.rounds);
+                populateSelect('inputBet', CONFIG.bets);
+                populateSelect('inputPlayers', CONFIG.players);
+                // Call updatePreview after population to ensure defaults are set
+                setTimeout(updatePreview, 100);
+            } else {
+                console.error("Config file not loaded!");
+            }
+        }
+
+        function populateSelect(id, options) {
+            const select = document.getElementById(id);
+            select.innerHTML = '';
+            options.forEach(opt => {
+                const el = document.createElement('option');
+                el.value = opt;
+                el.innerText = opt;
+                select.appendChild(el);
+            });
+            select.selectedIndex = 0;
+        }
+
+        // Logic
+        let rules = [
+            { text: "Toxic 100%", status: "deny" },
+            { text: "เพิ่มถอนรายชื่อ (23:00-17:59)", status: "deny" },
+            { text: "อนุญาตเปลี่ยนใบเป็นค่าปรับ", status: "allow" }
+        ];
+
+        function renderRules() {
+            const container = document.getElementById('rulesContainer');
+            container.innerHTML = '';
+            rules.forEach(rule => {
+                const isAllow = rule.status === 'allow';
+                // Sci-fi Badge Logic
+                const badgeClass = isAllow
+                    ? "bg-green-500 text-black font-bold shadow-[0_0_10px_rgba(0,255,65,0.4)]"
+                    : "bg-red-500 text-white font-bold shadow-[0_0_10px_rgba(239,68,68,0.4)]";
+                const badgeText = isAllow ? "อนุญาต" : "ไม่อนุญาต";
+
+                const html = `
+                <div class="flex justify-between items-center py-2.5 px-3 border border-white/5 bg-white/5 rounded backdrop-blur-sm mb-2">
+                    <span class="text-sm text-gray-200 font-medium flex items-center">
+                        <span class="w-2 h-2 rounded-sm ${isAllow ? 'bg-green-500' : 'bg-red-500'} mr-3 shadow-[0_0_8px_currentColor]"></span>
+                        ${rule.text}
+                    </span>
+                    <span class="text-[10px] px-3 py-1 rounded ${badgeClass} ml-2 min-w-[70px] text-center tracking-wider">${badgeText}</span>
+                </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function addRule() {
+            const text = document.getElementById('inputRuleText').value;
+            const status = document.getElementById('inputRuleStatus').value;
+            if (text) {
+                rules.push({ text, status });
+                document.getElementById('inputRuleText').value = '';
+                renderRules();
+            }
+        }
+
+        function clearRules() {
+            rules = [];
+            renderRules();
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return null;
+            const [y, m, d] = dateString.split('-');
+            if (!y || !m || !d) return dateString;
+            return `${d}/${m}/${y}`;
+        }
+
+        function updatePreview() {
+            // Helper to get value
+            const getVal = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value : '';
+            }
+
+            // Dates
+            const startDate = formatDate(getVal('inputStartDate')) || '--/--/----';
+            const endDate = formatDate(getVal('inputEndDate')) || '--/--/----';
+
+            document.getElementById('prevStartDate').innerText = startDate;
+            document.getElementById('prevEndDate').innerText = endDate;
+            document.getElementById('prevStartTime').innerText = getVal('inputStartTime') || '--:--';
+            document.getElementById('prevEndTime').innerText = getVal('inputEndTime') || '--:--';
+
+            // Other fields
+            const mappings = [
+                { id: 'inputType', target: 'prevType', default: 'N/A' },
+                { id: 'inputRound', target: 'prevRound', default: '-' },
+                { id: 'inputBet', target: 'prevBet', default: '0' },
+                { id: 'inputPlayers', target: 'prevPlayers', default: '0 vs 0' },
+                { id: 'inputGangA', target: 'prevGangA', default: 'GANG A' },
+                { id: 'inputGangB', target: 'prevGangB', default: 'GANG B' },
+                { id: 'inputLeaderA', target: 'prevLeaderA', default: '-' },
+                { id: 'inputLeaderB', target: 'prevLeaderB', default: '-' },
+                { id: 'inputFooter', target: 'prevFooter', default: '' },
+            ];
+
+            mappings.forEach(map => {
+                const input = document.getElementById(map.id);
+                const target = document.getElementById(map.target);
+                if (input && target) {
+                    target.innerText = input.value || map.default;
+                    // Auto-resize Font for Gang Names if too long
+                    if ((map.id === 'inputGangA' || map.id === 'inputGangB') && input.value.length > 10) {
+                        target.classList.add('text-2xl');
+                        target.classList.remove('text-4xl');
+                    } else if (map.id === 'inputGangA' || map.id === 'inputGangB') {
+                        target.classList.remove('text-2xl');
+                        target.classList.add('text-4xl');
+                    }
+                }
+            });
+        }
+
+        function loadFile(event, imgId) {
+            const output = document.getElementById(imgId);
+            const placeholder = document.getElementById(imgId.replace('img', 'ph'));
+
+            if (event.target.files && event.target.files[0]) {
+                output.src = URL.createObjectURL(event.target.files[0]);
+                output.onload = function () {
+                    URL.revokeObjectURL(output.src)
+                }
+                output.classList.remove('hidden');
+                if (placeholder) placeholder.classList.add('hidden');
+            }
+        }
+
+        function printPDF() {
+            window.print();
+        }
+
+        function saveImage() {
+            const captureArea = document.getElementById('captureArea');
+
+            // Pre-process
+            captureArea.classList.add('saving-mode');
+
+            html2canvas(captureArea, {
+                scale: 2,
+                backgroundColor: '#020402', // New dark bg
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                onclone: (clonedDoc) => {
+                    const clone = clonedDoc.getElementById('captureArea');
+
+                    // 1. Remove hidden/empty images
+                    const images = clone.querySelectorAll('img');
+                    images.forEach(img => {
+                        if (img.classList.contains('hidden') || !img.src || img.getAttribute('src') === "") {
+                            img.remove();
+                        }
+                    });
+
+                    // 2. Fix Layout
+                    clone.style.width = "900px";
+                    clone.style.height = "auto";
+                    clone.style.margin = "0";
+                    clone.style.transform = "none";
+                    clone.style.boxShadow = "none"; // Remove shadow for clean save
+
+                    // 3. Fix Gradients & Text
+                    const gradients = clone.querySelectorAll('.text-transparent');
+                    gradients.forEach(el => {
+                        el.classList.remove('text-transparent', 'bg-clip-text');
+                        el.style.webkitTextFillColor = 'initial';
+                        el.style.color = '#FFFFFF';
+                        // Specific tweak for BIZ CITY if needed
+                        if (el.parentElement.tagName === 'H1') {
+                            // Gradient usually: from-white to-green-400
+                            // We'll just set it to solid white or green-200
+                            el.style.color = '#e0ffe0';
+                        }
+                    });
+
+                    // 4. Fix Backdrop Blur / Glass Effect
+                    // Helper to make glass opaque
+                    const fixGlass = (selector, color) => {
+                        const els = clone.querySelectorAll(selector);
+                        els.forEach(el => {
+                            el.style.backdropFilter = 'none';
+                            el.style.backgroundColor = color;
+                        });
+                    };
+
+                    fixGlass('.sci-glass', 'rgba(4, 20, 4, 0.95)');
+                    fixGlass('.sci-glass-strong', 'rgba(2, 10, 2, 0.98)');
+                    fixGlass('[class*="backdrop-blur"]', 'rgba(10, 20, 10, 0.9)');
+                }
+            }).then(canvas => {
+                captureArea.classList.remove('saving-mode');
+                const link = document.createElement('a');
+                link.download = 'BizCity-Announcement.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                captureArea.classList.remove('saving-mode');
+                console.error("Save Failed:", err);
+                alert("เกิดข้อผิดพลาด: " + err.message);
+            });
+        }
+
+        // Initialize
+        window.onload = function () {
+            // Set dates to today ISO format YYYY-MM-DD
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const dateStr = `${yyyy}-${mm}-${dd}`;
+
+            document.getElementById('inputStartDate').value = dateStr;
+            document.getElementById('inputEndDate').value = dateStr;
+
+            // Set Default Time
+            document.getElementById('inputStartTime').value = "20:00";
+            document.getElementById('inputEndTime').value = "22:00";
+
+            initConfig();
+            renderRules();
+        }
+    </script>
+</body>
+
+</html>
